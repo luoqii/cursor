@@ -2,6 +2,8 @@ package com.example.photocapture
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -10,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.MediaController
 import android.widget.Toast
@@ -19,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.photocapture.databinding.ActivityMainBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.R as MaterialR
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -133,30 +136,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPermissionRationale(onPositiveAction: () -> Unit) {
-        MaterialAlertDialogBuilder(this)
+        val dialog = materialStyledAlertDialogBuilder()
             .setTitle(R.string.app_name)
             .setMessage(R.string.camera_permission_explanation)
-            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+            .setPositiveButton(android.R.string.ok, null)
+            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE)?.setOnClickListener {
                 dialog.dismiss()
                 pendingPermissionAction = onPositiveAction
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
-            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
-            .show()
+        }
+        dialog.show()
     }
 
     private fun showPermissionDeniedDialog() {
-        MaterialAlertDialogBuilder(this)
+        val dialog = materialStyledAlertDialogBuilder()
             .setTitle(R.string.app_name)
             .setMessage(R.string.camera_permission_explanation)
-            .setPositiveButton(R.string.open_settings) { dialog, _ ->
+            .setPositiveButton(R.string.open_settings, null)
+            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE)?.setOnClickListener {
                 dialog.dismiss()
                 startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", packageName, null)
                 })
             }
-            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
-            .show()
+        }
+        dialog.show()
+    }
+
+    private fun materialStyledAlertDialogBuilder(): AlertDialog.Builder {
+        val themedContext = ContextThemeWrapper(this, MaterialR.style.ThemeOverlay_Material3_MaterialAlertDialog)
+        return AlertDialog.Builder(themedContext)
     }
 
     private fun launchCamera() {

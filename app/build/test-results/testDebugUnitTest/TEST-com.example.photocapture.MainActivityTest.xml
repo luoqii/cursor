@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.photocapture.MainActivityTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2025-11-14T07:52:10" hostname="cursor" time="3.198">
+  <properties/>
+  <testcase name="clickingOpenSettingsButton_launchesSettingsIntent" classname="com.example.photocapture.MainActivityTest" time="3.198">
+    <failure message="expected not to be: null" type="com.google.common.truth.AssertionErrorWithFacts">expected not to be: null
+	at com.example.photocapture.MainActivityTest.clickingOpenSettingsButton_launchesSettingsIntent(MainActivityTest.kt:39)
+	Suppressed: org.robolectric.android.internal.AndroidTestEnvironment$UnExecutedRunnablesException: Main looper has queued unexecuted runnables. This might be the cause of the test failure. You might need a shadowOf(Looper.getMainLooper()).idle() call.
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>
