@@ -9,4 +9,13 @@
     <external-files-path
         name="captured_images"
         path="images/" />
+    <external-cache-path
+        name="captured_videos_cache"
+        path="videos/" />
+    <cache-path
+        name="captured_videos_internal"
+        path="videos/" />
+    <external-files-path
+        name="captured_videos"
+        path="videos/" />
 </paths>

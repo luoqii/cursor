@@ -7,4 +7,11 @@
     <string name="retake_photo">重拍</string>
     <string name="last_photo_time">上次拍照：%1$s</string>
     <string name="error_loading_photo">无法加载照片，请重试。</string>
+    <string name="record_video">录制视频</string>
+    <string name="retake_video">重新录制</string>
+    <string name="last_video_time">上次录制视频：%1$s</string>
+    <string name="error_loading_video">无法播放视频，请重试。</string>
+    <string name="video_preview_content_description">视频预览</string>
+    <string name="camera_app_missing">未找到可用的摄像应用。</string>
+    <string name="video_capture_failed">视频录制失败，请重试。</string>
 </resources>
