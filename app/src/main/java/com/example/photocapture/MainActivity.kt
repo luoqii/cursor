@@ -81,18 +81,15 @@ class MainActivity : AppCompatActivity() {
                             file
                         )
                         displayVideo(uri)
-                        revokeUriPermission(
-                            uri,
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
+                        revokeVideoUriPermissions(uri)
                     } ?: Toast.makeText(this, R.string.video_capture_failed, Toast.LENGTH_SHORT).show()
                 }
 
-                Activity.RESULT_CANCELED -> currentVideoFile?.delete()
+                Activity.RESULT_CANCELED -> cleanupPendingVideoFile()
 
                 else -> {
                     Toast.makeText(this, R.string.video_capture_failed, Toast.LENGTH_SHORT).show()
-                    currentVideoFile?.delete()
+                    cleanupPendingVideoFile()
                 }
             }
             currentVideoFile = null
@@ -214,6 +211,16 @@ class MainActivity : AppCompatActivity() {
         return File.createTempFile("MP4_${'$'}timeStamp_", ".mp4", storageDir)
     }
 
+    private fun cleanupPendingVideoFile() {
+        currentVideoFile?.let { file ->
+            val uri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY, file)
+            revokeVideoUriPermissions(uri)
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+    }
+
     private fun displayPhoto(uri: Uri) {
         val bitmap = loadBitmapFromUri(uri)
         if (bitmap == null) {
@@ -265,6 +272,17 @@ class MainActivity : AppCompatActivity() {
         } catch (ex: Exception) {
             ex.printStackTrace()
             null
+        }
+    }
+
+    private fun revokeVideoUriPermissions(uri: Uri) {
+        try {
+            revokeUriPermission(
+                uri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        } catch (_: SecurityException) {
+            // Permission may already be revoked; ignore to avoid crash.
         }
     }
 

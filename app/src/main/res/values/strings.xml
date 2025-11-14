@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">PhotoCapture</string>
-    <string name="camera_permission_explanation">需要相机权限才能拍照。</string>
+    <string name="camera_permission_explanation">需要相机权限才能拍照或录制视频。</string>
     <string name="open_settings">前往设置</string>
     <string name="cancel">取消</string>
     <string name="take_photo">拍照</string>

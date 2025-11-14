@@ -47,7 +47,7 @@
         android:textColor="@color/black"
         android:textAlignment="center"
         android:text=""
-        app:layout_constraintTop_toBottomOf="@id/photoPreview"
+        app:layout_constraintTop_toBottomOf="@id/previewContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
