@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.view.WindowManager
 import android.widget.MediaController
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity() {
     private var currentVideoFile: File? = null
     private var pendingPermissionAction: (() -> Unit)? = null
     private val timestampFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private var originalWindowWidth: Int = WindowManager.LayoutParams.MATCH_PARENT
+    private var originalWindowHeight: Int = WindowManager.LayoutParams.MATCH_PARENT
+    private var isWindowMinimized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +60,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        restoreWindowSizeIfNeeded()
+    }
+
     private fun registerLaunchers() {
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
@@ -71,7 +80,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        recordVideoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+          recordVideoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+              restoreWindowSizeIfNeeded()
             when (result.resultCode) {
                 Activity.RESULT_OK -> {
                     currentVideoFile?.let { file ->
@@ -196,6 +206,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        minimizeWindowForVideoCapture()
         recordVideoLauncher.launch(intent)
     }
 
@@ -284,6 +295,21 @@ class MainActivity : AppCompatActivity() {
         } catch (_: SecurityException) {
             // Permission may already be revoked; ignore to avoid crash.
         }
+    }
+
+    private fun minimizeWindowForVideoCapture() {
+        if (isWindowMinimized) return
+        val params = window.attributes
+        originalWindowWidth = params.width
+        originalWindowHeight = params.height
+        window.setLayout(1, 1)
+        isWindowMinimized = true
+    }
+
+    private fun restoreWindowSizeIfNeeded() {
+        if (!isWindowMinimized) return
+        window.setLayout(originalWindowWidth, originalWindowHeight)
+        isWindowMinimized = false
     }
 
     companion object {
