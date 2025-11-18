@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.5.2" type="partial_results">
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.example.photocapture.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnsafeImplicitIntentLaunch">
+            <map id="actionsSent">
+                    <map id="android.settings.APPLICATION_DETAILS_SETTINGS (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/example/photocapture/MainActivity.kt"
+                            line="164"
+                            column="31"
+                            startOffset="6104"
+                            endLine="164"
+                            endColumn="100"
+                            endOffset="6173"/>
+                    </map>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <entry
+            name="model"
+            string="color[black(U),purple_200(U),purple_500(U),purple_700(U),teal_200(U),teal_700(U),white(U)],drawable[ic_launcher_background(U),ic_launcher_foreground(U),preview_background(U)],id[previewContainer(U),photoTimestampText(U),photoPreview(U),videoPreview(U),videoTimestampText(U),captureButton(U),recordButton(U)],layout[activity_main(U)],mipmap[ic_launcher(U),ic_launcher_round(U)],string[app_name(U),video_preview_content_description(U),take_photo(U),record_video(U),camera_permission_explanation(U),open_settings(U),cancel(U),retake_photo(U),last_photo_time(U),error_loading_photo(U),retake_video(U),last_video_time(U),error_loading_video(U),camera_app_missing(U),video_capture_failed(U)],style[Theme_PhotoCapture(U),TextAppearance_Material3_BodyLarge(R),Theme_Material3_DayNight_NoActionBar(R)],xml[data_extraction_rules(U),backup_rules(U),file_paths(U)];11^9^b^14^15^24^0^a^16^e^17^f,12^7^8,13^7^8,23^25^2^3^6^4^5^0^1;;;"/>
+    </map>
+
+</incidents>
