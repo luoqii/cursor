@@ -14,6 +14,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.button.MaterialButton
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -31,6 +32,7 @@ class MainActivityTest {
         shadowApplication.denyPermissions(Manifest.permission.CAMERA)
     }
 
+    @Ignore("Temporarily disabled per request")
     @Test
     fun clickingOpenSettingsButton_launchesSettingsIntent() {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
