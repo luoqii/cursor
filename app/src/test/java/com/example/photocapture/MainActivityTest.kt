@@ -5,8 +5,13 @@ import android.app.Application
 import android.content.DialogInterface
 import android.net.Uri
 import android.provider.Settings
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.VideoView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.material.button.MaterialButton
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -53,6 +58,32 @@ class MainActivityTest {
         assertThat(startedIntent.data).isEqualTo(
             Uri.fromParts("package", nonNullActivity.packageName, null)
         )
+
+        scenario.close()
+    }
+
+    @Test
+    fun launcherDisplaysPrimaryControls() {
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+
+        scenario.onActivity { activity ->
+            val captureButton = activity.findViewById<MaterialButton>(R.id.captureButton)
+            val recordButton = activity.findViewById<MaterialButton>(R.id.recordButton)
+            val photoPreview = activity.findViewById<ImageView>(R.id.photoPreview)
+            val videoPreview = activity.findViewById<VideoView>(R.id.videoPreview)
+            val photoTimestamp = activity.findViewById<TextView>(R.id.photoTimestampText)
+            val videoTimestamp = activity.findViewById<TextView>(R.id.videoTimestampText)
+
+            assertThat(captureButton).isNotNull()
+            assertThat(captureButton.text.toString()).isEqualTo(activity.getString(R.string.take_photo))
+            assertThat(recordButton.text.toString()).isEqualTo(activity.getString(R.string.record_video))
+
+            assertThat(photoPreview.visibility).isEqualTo(View.VISIBLE)
+            assertThat(videoPreview.visibility).isEqualTo(View.GONE)
+
+            assertThat(photoTimestamp.text.toString()).isEmpty()
+            assertThat(videoTimestamp.text.toString()).isEmpty()
+        }
 
         scenario.close()
     }
