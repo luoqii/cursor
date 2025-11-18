@@ -9,19 +9,26 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.VideoView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityOptionsCompat
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.button.MaterialButton
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
+import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowAlertDialog
 import org.robolectric.shadows.ShadowApplication
 
 @RunWith(RobolectricTestRunner::class)
+@Config(shadows = [ShadowMainActivity::class])
 class MainActivityTest {
 
     @Before
@@ -29,6 +36,14 @@ class MainActivityTest {
         val application = ApplicationProvider.getApplicationContext<Application>()
         val shadowApplication: ShadowApplication = Shadows.shadowOf(application)
         shadowApplication.denyPermissions(Manifest.permission.CAMERA)
+        ShadowAlertDialog.reset()
+        ShadowMainActivity.reset()
+    }
+
+    @After
+    fun tearDown() {
+        ShadowAlertDialog.reset()
+        ShadowMainActivity.reset()
     }
 
     @Test
@@ -63,6 +78,49 @@ class MainActivityTest {
     }
 
     @Test
+    fun captureClick_whenShouldShowRequestPermissionRationaleTrue_showsRationaleDialog() {
+        ShadowMainActivity.setShouldShowRationale(true)
+
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+        scenario.onActivity { activity ->
+            activity.findViewById<MaterialButton>(R.id.captureButton).performClick()
+        }
+
+        val dialog = ShadowAlertDialog.getLatestAlertDialog()
+        assertThat(dialog).isNotNull()
+        val shadowDialog = Shadows.shadowOf(dialog)
+        val expectedMessage =
+            ApplicationProvider.getApplicationContext<Application>()
+                .getString(R.string.camera_permission_explanation)
+        assertThat(shadowDialog.message.toString()).isEqualTo(expectedMessage)
+
+        scenario.close()
+    }
+
+    @Test
+    fun captureClick_whenShouldShowRequestPermissionRationaleFalse_requestsPermission() {
+        ShadowMainActivity.setShouldShowRationale(false)
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+        val testLauncher = TestPermissionLauncher()
+
+        scenario.onActivity { activity ->
+            setPrivateField(activity, "permissionLauncher", testLauncher)
+            val initialPendingAction: (() -> Unit)? =
+                getPrivateField(activity, "pendingPermissionAction")
+            assertThat(initialPendingAction).isNull()
+
+            activity.findViewById<MaterialButton>(R.id.captureButton).performClick()
+
+            val updatedPendingAction: (() -> Unit)? =
+                getPrivateField(activity, "pendingPermissionAction")
+            assertThat(updatedPendingAction).isNotNull()
+        }
+
+        assertThat(testLauncher.launchedPermission).isEqualTo(Manifest.permission.CAMERA)
+        scenario.close()
+    }
+
+    @Test
     fun launcherDisplaysPrimaryControls() {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
@@ -87,4 +145,34 @@ class MainActivityTest {
 
         scenario.close()
     }
+
+    private fun setPrivateField(target: Any, fieldName: String, value: Any?) {
+        val field = target::class.java.getDeclaredField(fieldName)
+        field.isAccessible = true
+        field.set(target, value)
+    }
+
+    private fun <T> getPrivateField(target: Any, fieldName: String): T {
+        val field = target::class.java.getDeclaredField(fieldName)
+        field.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        return field.get(target) as T
+    }
+}
+
+private class TestPermissionLauncher : ActivityResultLauncher<String>() {
+    var launchedPermission: String? = null
+        private set
+
+    private val requestPermissionContract = ActivityResultContracts.RequestPermission()
+
+    override fun launch(input: String, options: ActivityOptionsCompat?) {
+        launchedPermission = input
+    }
+
+    override fun unregister() {
+        // No-op for tests.
+    }
+
+    override fun getContract(): ActivityResultContract<String, Boolean> = requestPermissionContract
 }
